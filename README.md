@@ -2,49 +2,41 @@
 
 The aim of this project is to automate the process of repeatedly requesting ChatGPT to handle data.
 
-This program concatenates  ```prompt_prefix``` and ```prompt_suffix``` with prompt and saves the response of ChatGPT.
+This program concatenates  ```prompt_prefix``` and ```prompt_suffix``` with prompt(content in ```partx.txt```) and saves the response of ChatGPT.
 
 ## How To Execute
 
 1. Generate and fill out config.json (Referencing config.example.json)
 
-2. Put the research paper data into the ```./data``` folder. The format for each paper is as follows:
+2. Put the tasks into the ```./data``` folder. The format for each task is as follows:
     ```
-    └── Paper folder
+    └── task folder
         ├── meta.json
         ├── part1.txt
         ├── part2.txt
         ├── part3.txt
         └── part4.txt
     ```
-    - Paper's content has been split into multiple parts, each containing approximately 3,000 tokens.
-    - The format for meta.json is as follows:
-    ```
-    {
-        "title": "Paper title",
-        "filename": "Paper filename"
-    }
-    ```
+    - Every part(1-based) will be used as prompt.
+    - Each task will be outputted to its corresponding folder. The original information in meta.json will be preserved and additional information will be appended, such as "token usage" and "cost".
 
     - example
         - ```
             ./data
-            ├── Paper A
+            ├── Task A
             │   ├── meta.json
             │   ├── part1.txt
             │   ├── part2.txt
             │   ├── part3.txt
             │   ├── part4.txt
             │   └── part5.txt
-            └── Paper B
+            └── Task B
                 ├── meta.json
                 ├── part1.txt
                 ├── part2.txt
                 ├── part3.txt
                 └── part4.txt
             ```
-
-    - Every paper folder will be considered a task, and the process will record the token usage and cost of the task in the output result.
 
 3. Install python dependencies
     ```shell
@@ -56,16 +48,11 @@ This program concatenates  ```prompt_prefix``` and ```prompt_suffix``` with prom
     python get_result.py
     ```
 
-5. This script will parse the QA information in the output folder to a CSV file
-    ```shell
-    python parse_result.py --result_folder_name <generated folder name under output folder>
-    ```
-
 ## Output format
 - The output of get_result.py will be in the following format:
     ```
     20230524_220036
-    └── Paper A
+    └── Task A
         ├── meta.json
         ├── output_1.json
         ├── output_2.json
@@ -73,7 +60,8 @@ This program concatenates  ```prompt_prefix``` and ```prompt_suffix``` with prom
         ├── output_4.json
         └── output_5.json
     ```
-    - The file ```meta.json``` will preserve its original key-value pairs and add information about token usage and cost. Its format is as follows:
+    
+- The file ```meta.json``` will preserve its original key-value pairs and add information about token usage and cost. For example:
     ```
     {
         "title": "Paper title",
@@ -82,9 +70,26 @@ This program concatenates  ```prompt_prefix``` and ```prompt_suffix``` with prom
         "cost": <total cost>
     }
     ```
-    - ```output_x.json``` is the response of OpenAI API
+- ```output_x.json``` is the response of OpenAI API with ```part_x.txt```
 
-- ```parse_result.py``` will generate a CSV file with the following columns:
-    - "question", "answer", "title", "filename"
+## Supported task (post-processing)
+
+- Generating Q&A related to agriculture from paper
+    - Use this setting for generating output
+        - prompt_prefix / suffix: see ```./task_record/task_prompt.md```
+        - The format for meta.json is as follows:
+            ```
+            {
+                "title": "Paper title",
+                "filename": "Paper filename"
+            }
+            ```
+
+    -  Generate a CSV file with the following columns:
+        - "question", "answer", "title", "filename"-   
+        ```shell
+        python post_process.py --task AgricultureQA --result_folder_name <generated folder name under output folder> 
+        ``` 
+       
     
     

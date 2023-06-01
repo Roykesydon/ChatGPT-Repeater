@@ -7,11 +7,11 @@ from natsort import natsorted
 from data_handler.JsonHandler import JsonHandler
 
 """
-存取切割好的 paper 資料
+存取切割好的 task 資料
 """
 
 
-class PaperHandler:
+class TaskHandler:
     def __init__(self, config: dict):
         self._config = config
 
@@ -49,9 +49,9 @@ class PaperHandler:
 
         return parts
 
-    def get_paper_data(self, folder_path: str) -> dict:
+    def get_task_data(self, folder_path: str) -> dict:
         """
-        回傳論文資料夾中的資料
+        回傳 task 資料夾中的資料
         """
         json_handler = JsonHandler()
         metadata = json_handler.return_json_as_dict(
@@ -64,7 +64,7 @@ class PaperHandler:
 
     def create_all_result_folder(self) -> str:
         """
-        根據當下時間建立存放所有 paper 的 output 的資料夾
+        根據當下時間建立存放所有 task 的 output 的資料夾
         """
         output_folder = self._config["output_folder"]
 
@@ -75,29 +75,29 @@ class PaperHandler:
 
         return output_folder_path
 
-    def create_paper_result_folder(
-        self, output_folder_path: str, paper_data: dict
+    def create_task_result_folder(
+        self, output_folder_path: str, task_data: dict
     ) -> str:
         """
-        建立 paper 資料夾
+        建立 task 資料夾
         """
-        paper_path = os.path.join(output_folder_path, paper_data["folder_name"])
-        os.makedirs(paper_path)
-        return paper_path
+        task_path = os.path.join(output_folder_path, task_data["folder_name"])
+        os.makedirs(task_path)
+        return task_path
 
     def save_response(
-        self, result: dict, output_paper_path: str, part_index: int
+        self, result: dict, output_task_path: str, part_index: int
     ) -> None:
         """
         儲存論文資訊，part_index 是 1-based
         """
 
         # 儲存 api 回傳結果
-        result_json_path = os.path.join(output_paper_path, f"output_{part_index}.json")
+        result_json_path = os.path.join(output_task_path, f"output_{part_index}.json")
         json_handler = JsonHandler()
         json_handler.save_json(json_path=result_json_path, data=result)
 
-    def save_meta_data(self, output_paper_path: str, meta_data: dict) -> None:
-        meta_data_path = os.path.join(output_paper_path, "meta.json")
+    def save_meta_data(self, output_task_path: str, meta_data: dict) -> None:
+        meta_data_path = os.path.join(output_task_path, "meta.json")
         json_handler = JsonHandler()
         json_handler.save_json(json_path=meta_data_path, data=meta_data)
