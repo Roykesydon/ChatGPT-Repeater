@@ -23,6 +23,7 @@ class ChatGPT:
         ChatGPT._api_key = api_key
         openai.api_key = ChatGPT._api_key
 
+    @backoff.on_exception(backoff.expo, openai.error.ServiceUnavailableError)
     @backoff.on_exception(backoff.expo, openai.error.RateLimitError)
     def generate_response(self, prompt: str) -> dict:
         # Check API Key setting
